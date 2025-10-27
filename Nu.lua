@@ -658,6 +658,70 @@ CreateButton(AdminContainer, "Play Music 2", function()
     print("Music 2 playing! 🎵")
 end)
 
+CreateButton(AdminContainer, "Play Music 3", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 95877137552489")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 3 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 4", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 128146983730820")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 4 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 5", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 85822106162452")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 5 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 6", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 87955145123199")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 6 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 7", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 89457616769239")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 7 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 8", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 126581313655066")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 8 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 9", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 82111196573441")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 9 playing! 🎵")
+end)
+
+CreateButton(AdminContainer, "Play Music 10", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+    RequestCommand:InvokeServer(";music 132489422597255")
+    RequestCommand:InvokeServer(";volume inf")
+    print("Music 10 playing! 🎵")
+end)
+
 CreateButton(AdminContainer, "Stop Music", function()
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
