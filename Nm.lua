@@ -517,76 +517,31 @@ CreateButton(F3XContainer, "Diagonal Map", function()
     end
 end)
 
--- Real Skybox without GUI
-local Lighting = game:GetService("Lighting")
+-- Function to apply Skybox
+local function applySkybox()
+    local Lighting = game:GetService("Lighting")
 
--- Remove any old Skybox
-for _, v in ipairs(Lighting:GetChildren()) do
-	if v:IsA("Sky") then
-		v:Destroy()
-	end
-end
-
--- Create new Skybox
-local sky = Instance.new("Sky")
-sky.Name = "CustomSky"
-sky.SkyboxBk = "http://www.roblox.com/asset/?id=130007058879269"
-sky.SkyboxDn = "http://www.roblox.com/asset/?id=130007058879269"
-sky.SkyboxFt = "http://www.roblox.com/asset/?id=130007058879269"
-sky.SkyboxLf = "http://www.roblox.com/asset/?id=130007058879269"
-sky.SkyboxRt = "http://www.roblox.com/asset/?id=130007058879269"
-sky.SkyboxUp = "http://www.roblox.com/asset/?id=130007058879269"
-sky.Parent = Lighting
-
-print("Skybox applied successfully!")
-
--- Decal Spam
-CreateButton(F3XContainer, "Decal Spam", function()
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
-
-    RequestCommand:InvokeServer(";btools")
-    
-    local tool = getF3XTool()
-    if tool then
-        local remote = tool.SyncAPI.ServerEndpoint
-        
-        for i,v in workspace:GetDescendants() do
-            if v:IsA("Part") then
-                spawn(function()
-                    local faces = {
-                        Enum.NormalId.Front,
-                        Enum.NormalId.Back,
-                        Enum.NormalId.Right,
-                        Enum.NormalId.Left,
-                        Enum.NormalId.Top,
-                        Enum.NormalId.Bottom
-                    }
-                    
-                    for _, face in pairs(faces) do
-                        remote:InvokeServer("CreateTextures", {
-                            [1] = {
-                                Part = v,
-                                Face = face,
-                                TextureType = "Decal"
-                            }
-                        })
-                        
-                        remote:InvokeServer("SyncTexture", {
-                            [1] = {
-                                Part = v,
-                                Face = face,
-                                TextureType = "Decal",
-                                Texture = "http://www.roblox.com/asset/?id=130007058879269"
-                            }
-                        })
-                    end
-                end)
-            end
+    -- Remove old Skybox
+    for _, v in ipairs(Lighting:GetChildren()) do
+        if v:IsA("Sky") then
+            v:Destroy()
         end
     end
-end)
 
+    -- Create new Skybox
+    local sky = Instance.new("Sky")
+    sky.Name = "CustomSky"
+    sky.SkyboxBk = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.SkyboxDn = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.SkyboxFt = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.SkyboxLf = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.SkyboxRt = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.SkyboxUp = "http://www.roblox.com/asset/?id=130007058879269"
+    sky.Parent = Lighting
+end
+
+-- Example: connect to a button (replace 'YourButton' with your actual button)
+YourButton.MouseButton1Click:Connect(applySkybox)
 -- ADMIN BUTTONS --
 
 -- Avatars neymar
