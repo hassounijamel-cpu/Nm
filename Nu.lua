@@ -517,40 +517,28 @@ CreateButton(F3XContainer, "Diagonal Map", function()
     end
 end)
 
--- Skybox
-CreateButton(F3XContainer, "Skybox", function()
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+-- Real Skybox without GUI
+local Lighting = game:GetService("Lighting")
 
-    RequestCommand:InvokeServer(";btools")
-    RequestCommand:InvokeServer(";fogcolor black")
-    
-    local tool = getF3XTool()
-    if tool then
-        local remote = tool.SyncAPI.ServerEndpoint
-        local char = game.Players.LocalPlayer.Character
-        local hrp = char.HumanoidRootPart
-        
-        local cf = hrp.CFrame + Vector3.new(0, 5, 0)
-        remote:InvokeServer("CreatePart", "Normal", cf, workspace)
-        
-        for i,v in workspace:GetChildren() do
-            if v:IsA("Part") and v.Position == cf.Position then
-                remote:InvokeServer("CreateMeshes", {[1] = {Part = v}})
-                remote:InvokeServer("SyncMesh", {
-                    [1] = {
-                        Part = v,
-                        MeshId = "http://www.roblox.com/asset/?id=130007058879269",
-                        TextureId = "http://www.roblox.com/asset/?id=130007058879269",
-                        Scale = Vector3.new(10000, 10000, 10000)
-                    }
-                })
-                remote:InvokeServer("SetLocked", {[1] = v}, true)
-                break
-            end
-        end
-    end
-end)
+-- Remove any old Skybox
+for _, v in ipairs(Lighting:GetChildren()) do
+	if v:IsA("Sky") then
+		v:Destroy()
+	end
+end
+
+-- Create new Skybox
+local sky = Instance.new("Sky")
+sky.Name = "CustomSky"
+sky.SkyboxBk = "http://www.roblox.com/asset/?id=130007058879269"
+sky.SkyboxDn = "http://www.roblox.com/asset/?id=130007058879269"
+sky.SkyboxFt = "http://www.roblox.com/asset/?id=130007058879269"
+sky.SkyboxLf = "http://www.roblox.com/asset/?id=130007058879269"
+sky.SkyboxRt = "http://www.roblox.com/asset/?id=130007058879269"
+sky.SkyboxUp = "http://www.roblox.com/asset/?id=130007058879269"
+sky.Parent = Lighting
+
+print("Skybox applied successfully!")
 
 -- Decal Spam
 CreateButton(F3XContainer, "Decal Spam", function()
