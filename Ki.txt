@@ -10376,7 +10376,7 @@ local args = {
 game:GetService("ReplicatedStorage").RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer(unpack(args))
 
 end })
-local Tab11 = Window:MakeTab({"FE", "scroll"})
+local SkyboxTab = Window:MakeTab({ Title = "SKYBOX", Icon = "rbxassetid://10709805838" })
 
 local skyboxEnabled = false
 local skyboxTrack = nil
