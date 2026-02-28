@@ -10728,5 +10728,3 @@ SkyboxTab:AddToggle({
 		end
 	end
 })
-
-local Section = Tab11:AddSection({"R6قريبا"})
