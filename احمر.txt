@@ -5574,7 +5574,6 @@ end
 workspace.CurrentCamera.CameraSubject=game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
   end
 })
-local Tab3 = Window:MakeTab({"سكنات", "shirt"})
 local Tab4 = Window:MakeTab({ Title = "نسخ سكنات", Icon = "rbxassetid://10734952036" })
 Tab4:AddSection({ Name = "          v1 نسخ سكنات", Icon = "rbxassetid://10734952036" })
 local Players = game:GetService("Players")
