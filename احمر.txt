@@ -850,9 +850,17 @@ Window:AddMinimizeButton({
     Button = {
         Image = "rbxassetid://99353410676626",
         BackgroundTransparency = 0,
-        Size = UDim2.new(0, 30, 0, 30) -- حجم الزر
+        Size = UDim2.new(0, 30, 0, 30)
     },
     Corner = { CornerRadius = UDim.new(35, 1) },
+
+    Callback = function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://139658322785649"
+        sound.Volume = 1
+        sound.Parent = game:GetService("CoreGui")
+        sound:Play()
+    end
 })
 local InfoTab = Window:MakeTab({ Title = "الحقوق", Icon = "rbxassetid://99353410676626" })
 
