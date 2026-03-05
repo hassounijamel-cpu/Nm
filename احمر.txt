@@ -836,20 +836,21 @@ local args = {
     Color3.fromRGB(20, 20, 20) -- ⚫ أسود غامق
 }
 game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1RPNam1eColo1r"):FireServer(unpack(args))
-local Libary = loadstring(game:HttpGet("https://raw.githubusercontent.com/youssefhesham542/Y2-Hub/refs/heads/main/montdrredz"))()
+local Libary = loadstring(game:HttpGet("https://raw.githubusercontent.com/hassounijamel-cpu/GUI/refs/heads/main/GUI.txt"))()
 workspace.FallenPartsDestroyHeight = -math.huge
 
 local Window = Libary:MakeWindow({
     Title = "NEYMAR HUB",
     SubTitle = "by: Kdkjdnde",
     LoadText = "Best Arabic script",
-    Flags = "ismail_Broookhaven"
+    Icon = "rbxassetid://108944065065556", -- حط هنا ايدي الصوره
+    Flags = "neymar_Broookhaven"
 })
 Window:AddMinimizeButton({
-    Button = { Image = "rbxassetid://81886512783938", BackgroundTransparency = 0 },
+    Button = { Image = "rbxassetid://99353410676626", BackgroundTransparency = 0 },
     Corner = { CornerRadius = UDim.new(35, 1) },
 })
-local InfoTab = Window:MakeTab({ Title = "الحقوق", Icon = "rbxassetid://81886512783938" })
+local InfoTab = Window:MakeTab({ Title = "الحقوق", Icon = "rbxassetid://99353410676626" })
 
 
 InfoTab:AddSection({ "معلومات سكربت" })
