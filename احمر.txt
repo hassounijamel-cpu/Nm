@@ -847,7 +847,11 @@ local Window = Libary:MakeWindow({
     Flags = "neymar_Broookhaven"
 })
 Window:AddMinimizeButton({
-    Button = { Image = "rbxassetid://99353410676626", BackgroundTransparency = 0 },
+    Button = {
+        Image = "rbxassetid://99353410676626",
+        BackgroundTransparency = 0,
+        Size = UDim2.new(0, 30, 0, 30) -- حجم الزر
+    },
     Corner = { CornerRadius = UDim.new(35, 1) },
 })
 local InfoTab = Window:MakeTab({ Title = "الحقوق", Icon = "rbxassetid://99353410676626" })
