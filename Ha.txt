@@ -2790,3 +2790,1618 @@ FunTab:AddButton({
         game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer(unpack(args))
     end
 })
+local CarTab = Window:MakeTab({ Title = "السيارات", Icon = "rbxassetid://10709789810" })
+CarTab:AddSection({ Name = "سرعة تيربو          ", Icon = "rbxassetid://10734954538" })
+local speedValue = 200
+local turboValue = 11.3
+
+local function getAllCars()
+    local cars = {}
+    if workspace:FindFirstChild("Vehicles") then
+        for _, vehicle in pairs(workspace.Vehicles:GetChildren()) do
+            if vehicle:FindFirstChild("Seats") and vehicle.Seats:FindFirstChild("VehicleSeat") then
+                table.insert(cars, vehicle)
+            end
+        end
+    end
+    return cars
+end
+
+local function applyToAllCars(valueType, value)
+    local cars = getAllCars()
+    local carsModified = 0
+
+    for _, car in pairs(cars) do
+        local seat = car.Seats.VehicleSeat
+        local target = seat:FindFirstChild(valueType)
+
+        if target and target.Value ~= nil then
+            target.Value = value
+            carsModified += 1
+        else
+            pcall(function()
+                seat[valueType] = value
+                carsModified += 1
+            end)
+        end
+    end
+
+    newNotify(" تم", "تم تعديل " .. carsModified .. " سيارة")
+end
+
+
+CarTab:AddTextBox({
+    Title = "سرعة السيارة",
+    Placeholder = "مثال: 300",
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            speedValue = num
+            newNotify("جاهز", "تم تحديد السرعة : " .. num)
+        else
+            newNotify(" خطأ", "أدخل رقم صحيح")
+        end
+    end
+})
+
+CarTab:AddTextBox({
+    Title = "قوة التيربو",
+    Placeholder = "مثال: 15",
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            turboValue = num
+            newNotify("جاهز", "تم تحديد التيربو : " .. num)
+        else
+            newNotify("خطأ", "أدخل رقم صحيح")
+        end
+    end
+})
+
+CarTab:AddButton({
+    Title = "تطبيق السرعة",
+    Callback = function()
+        applyToAllCars("MaxSpeed", speedValue)
+    end
+})
+
+CarTab:AddButton({
+    Title = " تطبيق التيربو",
+    Callback = function()
+        applyToAllCars("Turbo", turboValue)
+    end
+})
+CarTab:AddSection({ Name = "اعدادات السيارة          ", Icon = "rbxassetid://10734954538" })
+local CurrentDecal = ""
+local CurrentVehicleUUID = nil
+
+local function ApplyDecal(decalId)
+    if not CurrentVehicleUUID then return end
+    
+    local formattedDecal = "http://www.roblox.com/asset/?id=" .. decalId
+    
+    pcall(function()
+        local Remote = game:GetService("ReplicatedStorage").Remotes.SuspensionHeightChanged
+        firesignal(Remote.OnClientEvent, CurrentVehicleUUID)
+        
+        game:GetService("ReplicatedStorage").Remotes.ApplyStateToVehicle:InvokeServer(
+            CurrentVehicleUUID,
+            {
+                ["Lights"] = {
+                    ["hazardsActive"] = false,
+                    ["lightsOn"] = false,
+                },
+                ["IsLocked"] = false,
+                ["Appearance"] = {
+                    ["IsSmoking"] = false,
+                    ["SuspensionHeight"] = 1.1,
+                    ["BabyCarSeatInstalledNumber"] = 0,
+                    ["IsOnFire"] = false,
+                    ["WheelDecal"] = formattedDecal,
+                },
+                ["Performance"] = {
+                    ["Turbo"] = 0,
+                    ["MaxSpeed"] = 25,
+                    ["DriftStrength"] = 1,
+                },
+                ["Owner"] = game:GetService("Players").LocalPlayer,
+            }
+        )
+    end)
+end
+
+game:GetService("ReplicatedStorage").Remotes.PlayerSpawnedVehicle.OnClientEvent:Connect(function(data)
+    if data and data.uuid then
+        CurrentVehicleUUID = data.uuid
+    end
+end)
+
+CarTab:AddTextBox({
+    Name = "ستيكر العجلة",
+    Description = "حط ايدي صورة رح تتغير مع العجلات",
+    Default = "",
+    PlaceholderText = "93386023056221",
+    ClearText = false,
+    Callback = function(text)
+        if text and text:gsub(" ", ""):len() > 0 then
+            local cleanId = text:match("%d+")
+            if cleanId then
+                CurrentDecal = cleanId
+            end
+        end
+    end
+})
+
+CarTab:AddButton({
+    Name = "تطبيق",
+    Callback = function()
+        if CurrentDecal and CurrentDecal:len() > 0 then
+            ApplyDecal(CurrentDecal)
+        end
+    end
+})
+
+local spammingHeadLights = false
+local spammingHazardLights = false
+local spammingHorn = false
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function spamHeadLights()
+    while spammingHeadLights do
+        ReplicatedStorage.Remotes.ToggleHeadLights:InvokeServer()
+        wait(0.1)
+    end
+end
+
+local function spamHazardLights()
+    while spammingHazardLights do
+        ReplicatedStorage.Remotes.ToggleHazardLights:InvokeServer()
+        wait(0.1)
+    end
+end
+
+local function spamPlayHorn()
+    while spammingHorn do
+        ReplicatedStorage.Remotes.PlayHorn:InvokeServer()
+        wait(0.1)
+    end
+end
+
+CarTab:AddToggle({
+    Name = "سبام مصابيح",
+    Default = false,
+    Callback = function(value)
+        spammingHeadLights = value
+        if spammingHeadLights then
+            spawn(spamHeadLights)
+        else
+            wait(0.2)
+            ReplicatedStorage.Remotes.ToggleHeadLights:InvokeServer()
+        end
+    end
+})
+
+CarTab:AddToggle({
+    Name = "سبام غمازات",
+    Default = false,
+    Callback = function(value)
+        spammingHazardLights = value
+        if spammingHazardLights then
+            spawn(spamHazardLights)
+        else
+            wait(0.2)
+            ReplicatedStorage.Remotes.ToggleHazardLights:InvokeServer()
+        end
+    end
+})
+
+CarTab:AddToggle({
+    Name = "سبام هورن",
+    Default = false,
+    Callback = function(value)
+        spammingHorn = value
+        if spammingHorn then
+            spawn(spamPlayHorn)
+        else
+            ReplicatedStorage.Remotes.StopHorn:InvokeServer()
+        end
+    end
+})
+CarTab:AddToggle({
+    Name = "تلوين السيارة",
+    Default = false,
+    Callback = function(state)
+        isColorChanging = state
+        if isColorChanging then
+            colorChangeCoroutine = coroutine.create(changeCarColor)
+            coroutine.resume(colorChangeCoroutine)
+        end
+    end
+})
+
+
+_G.hubCarregando = true
+_G.togglesInicializadas = {}
+
+spawn(function()
+
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Remotes = ReplicatedStorage:WaitForChild("Remotes", 10)
+    
+    if Remotes then
+        local ResetRemote = Remotes:WaitForChild("ResetCharacterAppearance", 10)
+        
+        if ResetRemote then
+
+            local ResetOriginal = ResetRemote.FireServer
+            ResetRemote.FireServer = function(...)
+                if _G.hubCarregando then
+                    return -- Bloqueia reset durante carregamento
+                end
+                return ResetOriginal(...)
+            end
+        end
+    end
+    
+
+    wait(3)
+    _G.hubCarregando = false
+end)
+CarTab:AddSection({ Name = "تخريب على السيارات          ", Icon = "rbxassetid://10734962068" })
+local colors = {
+    Color3.new(1, 0, 0),     
+    Color3.new(0, 1, 0),     
+    Color3.new(0, 0, 1),     
+    Color3.new(1, 1, 0),     
+    Color3.new(1, 0, 1),     
+    Color3.new(0, 1, 1),     
+    Color3.new(0.5, 0, 0.5), 
+    Color3.new(1, 0.5, 0)    
+}
+
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local remoteEvent = replicatedStorage:WaitForChild("RE"):WaitForChild("1Player1sCa1r")
+
+local isColorChanging = false
+local colorChangeCoroutine = nil
+
+local function changeCarColor()
+    while isColorChanging do
+        for _, color in ipairs(colors) do
+            if not isColorChanging then return end
+            local args = {
+                [1] = "PickingCarColor",
+                [2] = color
+            }
+            remoteEvent:FireServer(unpack(args))
+            wait(1)
+        end
+    end
+end
+
+CarTab:AddButton({
+    Name = "حذف جميع السيارات بالقارب",
+    Callback = function()
+        local ofnawufn = false
+
+if ofnawufn == true then
+    return
+end
+ofnawufn = true
+
+local cawwfer = "MilitaryBoatFree" -- Changed to MilitaryBoatFree
+local oldcfffff = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1754, -2, 58) -- Updated coordinates
+wait(0.3)
+
+local args = {
+    [1] = "PickingBoat", 
+    [2] = cawwfer
+}
+
+game:GetService("ReplicatedStorage").RE:FindFirstChild("1Ca1r"):FireServer(unpack(args))
+wait(1)
+
+local wrinfjn
+for _, errb in pairs(game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"]:GetDescendants()) do
+    if errb:IsA("VehicleSeat") then
+        wrinfjn = errb
+    end
+end
+
+repeat
+    if game.Players.LocalPlayer.Character.Humanoid.Health == 0 then return end
+    if game.Players.LocalPlayer.Character.Humanoid.Sit == true then
+        if not game.Players.LocalPlayer.Character.Humanoid.SeatPart == wrinfjn then
+            game.Players.LocalPlayer.Character.Humanoid.Sit = false
+        end
+    end
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = wrinfjn.CFrame
+    task.wait()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = wrinfjn.CFrame + Vector3.new(0,1,0)
+    task.wait()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = wrinfjn.CFrame + Vector3.new(0,-1,0)
+    task.wait()
+until game.Players.LocalPlayer.Character.Humanoid.SeatPart == wrinfjn
+
+for _, wifn in pairs(game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"]:GetDescendants()) do
+    if wifn.Name == "PhysicalWheel" then
+        wifn:Destroy()
+    end
+end
+
+local FLINGED = Instance.new("BodyThrust", game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass) 
+FLINGED.Force = Vector3.new(50000, 0, 50000) 
+FLINGED.Name = "SUNTERIUM HUB FLING"
+FLINGED.Location = game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.Position
+
+for _, wvwvwasc in pairs(game.workspace.Vehicles:GetChildren()) do
+    for _, ascegr in pairs(wvwvwasc:GetDescendants()) do
+        if ascegr.Name == "VehicleSeat" then
+            local targetcar = ascegr
+            local tet = Instance.new("BodyVelocity", game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass)
+            tet.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+            tet.P = 1250
+            tet.Velocity = Vector3.new(0,0,0)
+            tet.Name = "#mOVOOEPF$#@F$#GERE..>V<<<<EW<V<<W"
+            for m=1,25 do
+                local pos = {x=0, y=0, z=0}
+                pos.x = targetcar.Position.X
+                pos.y = targetcar.Position.Y
+                pos.z = targetcar.Position.Z
+                pos.x = pos.x + targetcar.Velocity.X / 2
+                pos.y = pos.y + targetcar.Velocity.Y / 2
+                pos.z = pos.z + targetcar.Velocity.Z / 2
+                if pos.y <= -200 then
+                    game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.CFrame = CFrame.new(0,1000,0)
+                else
+                    game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.CFrame = CFrame.new(Vector3.new(pos.x,pos.y,pos.z))
+                    task.wait()
+                    game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.CFrame = CFrame.new(Vector3.new(pos.x,pos.y,pos.z)) + Vector3.new(0,-2,0)
+                    task.wait()
+                    game.workspace.Vehicles[game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.CFrame = CFrame.new(Vector3.new(pos.x,pos.y,pos.z)) * CFrame.new(0,0,2)
+                    task.wait()
+                    game.workspace.Vehicles[
+game.Players.LocalPlayer.Name.."Car"].Chassis.Mass.CFrame = CFrame.new(Vector3.new(pos.x,pos.y,pos.z)) * CFrame.new(2,0,0)
+                    task.wait()
+                end
+                task.wait()
+            end
+        end
+    end
+end
+
+task.wait()
+local args = {
+    [1] = "DeleteAllVehicles"
+}
+
+game:GetService("ReplicatedStorage").RE:FindFirstChild("1Ca1r"):FireServer(unpack(args))
+game.Players.LocalPlayer.Character.Humanoid.Sit = false
+wait()
+local tet = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character.HumanoidRootPart)
+tet.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+tet.P = 1250
+tet.Velocity = Vector3.new(0,0,0)
+tet.Name = "#mOVOOEPF$#@F$#GERE..>V<<<<EW<V<<W"
+wait(0.1)
+for m=1,2 do 
+    task.wait()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = oldcfffff
+end
+wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = oldcfffff
+wait()
+game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChild("#mOVOOEPF$#@F$#GERE..>V<<<<EW<V<<W"):Destroy()
+wait(0.2)
+ofnawufn = false
+    end
+})
+
+CarTab:AddButton({
+    Name = "اسحب كل سيارات السيرفر",
+    Callback = function()
+        for _, v in next, workspace.Vehicles:GetChildren() do
+            v:SetPrimaryPartCFrame(game.Players.LocalPlayer.Character:GetPrimaryPartCFrame())
+        end
+    end
+})
+CarTab:AddButton({
+    Name = "سكربت طيران السيارة",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/raelhubfunctions/Save-scripts/refs/heads/main/CarMobile.lua"))()
+    end
+})
+CarTab:AddButton({
+    Name = "سكربت  تيربو",
+    Callback = function()
+     local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+local flying = false
+local speed = 30
+
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+
+local function createImageButton(name, position, imageId, rotation, action)
+    local button = Instance.new("ImageButton", screenGui)
+    button.Size = UDim2.new(0, 60, 0, 60)
+    button.Position = position
+    button.BackgroundTransparency = 1
+    button.Image = "rbxassetid://" .. imageId
+    button.Rotation = rotation
+    button.MouseButton1Down:Connect(action)
+    return button
+end
+
+local forwardButton = createImageButton("ForwardButton", UDim2.new(0, 10, 0.35, 0), "18478249606", 0, function()
+    flying = true
+    while flying do
+        if humanoidRootPart then
+            humanoidRootPart.Velocity = humanoidRootPart.CFrame.LookVector * speed
+        end
+        task.wait()
+    end
+end)
+
+local backButton = createImageButton("BackButton", UDim2.new(0, 10, 0.5, 0), "18478249606", 180, function()
+    flying = true
+    while flying do
+        if humanoidRootPart then
+            humanoidRootPart.Velocity = -humanoidRootPart.CFrame.LookVector * speed
+        end
+        task.wait()
+    end
+end)
+
+local leftButton = createImageButton("LeftButton", UDim2.new(1, -210, 0.3, 0), "18478249606", -90, function()
+    flying = true
+    while flying do
+        if humanoidRootPart then
+            humanoidRootPart.Velocity = -humanoidRootPart.CFrame.RightVector * speed
+        end
+        task.wait()
+    end
+end)
+
+local rightButton = createImageButton("RightButton", UDim2.new(1, -140, 0.3, 0), "18478249606", 90, function()
+    flying = true
+    while flying do
+        if humanoidRootPart then
+            humanoidRootPart.Velocity = humanoidRootPart.CFrame.RightVector * speed
+        end
+        task.wait()
+    end
+end)
+
+local function stopFlying()
+    flying = false
+    if humanoidRootPart then
+        humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+    end
+end
+
+forwardButton.MouseButton1Up:Connect(stopFlying)
+backButton.MouseButton1Up:Connect(stopFlying)
+leftButton.MouseButton1Up:Connect(stopFlying)
+rightButton.MouseButton1Up:Connect(stopFlying)
+
+local turboButton = Instance.new("ImageButton", screenGui)
+turboButton.Size = UDim2.new(0, 60, 0, 60)
+turboButton.Position = UDim2.new(1, -130, 0, 10)
+turboButton.BackgroundTransparency = 1
+turboButton.Image = "rbxassetid://97607579386418"
+turboButton.MouseButton1Down:Connect(function()
+    speed = 300
+end)
+
+local minimizeButton = Instance.new("TextButton", screenGui)
+minimizeButton.Size = UDim2.new(0, 60, 0, 60)
+minimizeButton.Position = UDim2.new(0, 10, 0, 10)  -- Changed to top-left corner
+minimizeButton.BackgroundTransparency = 1
+minimizeButton.Text = "-"  -- Starts with "-" symbol
+minimizeButton.TextSize = 40
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local buttons = {forwardButton, backButton, leftButton, rightButton, turboButton}
+
+local minimized = false
+
+local function toggleButtons()
+    minimized = not minimized
+    for _, button in ipairs(buttons) do
+        button.Visible = not minimized
+    end
+    -- Change the text of the minimize button
+    if minimized then
+        minimizeButton.Text = "+"
+    else
+        minimizeButton.Text = "-"
+    end
+end
+
+minimizeButton.MouseButton1Down:Connect(toggleButtons)    
+    end
+})
+local carList = {
+    "SchoolBus", "SmartCar", "FarmTruck", "Cadillac", "Excavator",
+    "Jeep", "NascarTruck", "TowTruck", "Snowplow", "MilitaryTruck",
+    "Tank", "Limo", "FireTruck"
+}
+
+local spamCarsActive = false
+
+local function spawnCar(carName)
+    local args = {
+        [1] = "PickingCar",
+        [2] = carName
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(args))
+end
+
+CarTab:AddToggle({
+    Name = "سبام وضع سيارات",
+    Default = false,
+    Callback = function(state)
+        spamCarsActive = state
+        if spamCarsActive then
+            task.spawn(function()
+                while spamCarsActive do
+                    for _, carName in ipairs(carList) do
+                        if not spamCarsActive then break end
+                        spawnCar(carName)
+                        wait(0.4)
+                    end
+                end
+            end)
+        end
+    end
+})
+local FunTab = Window:MakeTab({ Title = "المتعة", Icon = "rbxassetid://10723407498" })
+local Section = FunTab:AddSection({"كتابة على لوحات السيرفر          "})
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local SelectedPoster = 1
+local PosterText = ""
+local PosterData = {
+    [1] = CFrame.new(359.589081, 57.149670, 581.226135),
+    [2] = CFrame.new(-634.203247, 25.374739, 361.505646),
+    [3] = CFrame.new(-238.497910, 88.514732, -549.373962)
+}
+local Dropdown = FunTab:AddDropdown({
+    Name = "اختيار رقم اللوحة",
+    Description = "",
+    Options = {"لوحة 1", "لوحة 2", "لوحة 3"},
+    Default = "لوحة 1",
+    Flag = "poster_dropdown",
+    Callback = function(Value)
+        if Value == "لوحة 1" then
+            SelectedPoster = 1
+        elseif Value == "لوحة 2" then
+            SelectedPoster = 2
+        elseif Value == "لوحة 3" then
+            SelectedPoster = 3
+        end
+    end
+})
+FunTab:AddTextBox({
+    Name = "اكتب هنا شتريد",
+    Description = "",
+    PlaceholderText = "LOC4T",
+    Callback = function(Value)
+        PosterText = Value
+    end
+})
+FunTab:AddButton({
+    Name = "تطبيق الكتابة",
+    Callback = function()
+        if not PosterText or PosterText == "" then
+            warn("LOC4T")
+            return
+        end
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        local humanoidRootPart = char.HumanoidRootPart
+        local originalPos = humanoidRootPart.CFrame
+        humanoidRootPart.CFrame = PosterData[SelectedPoster]
+        task.wait(0.8)
+        local args = {
+            [1] = "ReturningCommercialWords",
+            [2] = SelectedPoster,
+            [4] = PosterText
+        }
+        ReplicatedStorage.RE:FindFirstChild("1Cemeter1y"):FireServer(unpack(args))
+        task.wait(0.5)
+        humanoidRootPart.CFrame = originalPos
+    end
+})
+FunTab:AddSection({ "هالة كرة تجريبي          " })
+OrbitSettings = {
+    Speed = 2,
+    Distance = 6,
+    Height = 0,
+    Fling = false
+}
+FunTab:AddSlider({
+    Name = "سرعة دوران الكرة",
+    Min = 1,
+    Max = 20,
+    Default = 2,
+    Callback = function(Value)
+        OrbitSettings.Speed = Value
+    end
+})
+FunTab:AddSlider({
+    Name = "بعد الكرة",
+    Min = 1,
+    Max = 20,
+    Default = 6,
+    Callback = function(Value)
+        OrbitSettings.Distance = Value
+    end
+})
+FunTab:AddSlider({
+    Name = "ارتفاع الكرة",
+    Min = -10,
+    Max = 10,
+    Default = 0,
+    Callback = function(Value)
+        OrbitSettings.Height = Value
+    end
+})
+FunTab:AddToggle({
+    Name = "فعل ميزة الفلنق من يقربو عليك",
+    Default = false,
+    Callback = function(state)
+        OrbitSettings.Fling = state
+    end
+})
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local localPlayer = Players.LocalPlayer
+local orbitLoop
+local orbitBallInstance
+local orbitEnabledTouch = false
+local function DestroyOrbit()
+	if orbitLoop then
+		orbitLoop:Disconnect()
+		orbitLoop = nil
+	end
+	if orbitBallInstance then
+		orbitBallInstance:Destroy()
+		orbitBallInstance = nil
+	end
+end
+function orbitBall(targetChar, modeName)
+	if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then return end
+	local player = game:GetService("Players").LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local backpack = player:WaitForChild("Backpack")
+	local serverBalls = workspace:WaitForChild("WorkspaceCom"):WaitForChild("001_SoccerBalls")
+	if not backpack:FindFirstChild("SoccerBall") and not character:FindFirstChild("SoccerBall") then
+		game:GetService("ReplicatedStorage").RE:FindFirstChild("1Too1l"):InvokeServer("PickingTools", "SoccerBall")
+	end
+	repeat task.wait() until backpack:FindFirstChild("SoccerBall") or character:FindFirstChild("SoccerBall")
+	local ballTool = backpack:FindFirstChild("SoccerBall")
+	if ballTool then ballTool.Parent = character end
+	repeat task.wait() until serverBalls:FindFirstChild("Soccer"..player.Name)
+	local orb = serverBalls:FindFirstChild("Soccer"..player.Name)
+	if not orb then return end
+	orb.Name = modeName
+	orb.CanCollide = false
+	orb.Massless = true
+	orb.CustomPhysicalProperties = PhysicalProperties.new(0.0001, 0, 0)
+	if orb:FindFirstChild("FlingPower") then orb.FlingPower:Destroy() end
+	if OrbitSettings.Fling then
+		local bv = Instance.new("BodyVelocity")
+		bv.Name = "FlingPower"
+		bv.Velocity = Vector3.new(9e8, 9e8, 9e8)
+		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+		bv.P = 9e900
+		bv.Parent = orb
+	end
+	local loop = Instance.new("BindableEvent")
+	loop.Name = modeName.."Loop"
+	loop.Parent = character
+	task.spawn(function()
+		while loop.Parent and orb and orb.Parent and targetChar and targetChar.Parent do
+			local angle = tick() * OrbitSettings.Speed
+			local offset = CFrame.new(
+				math.cos(angle) * OrbitSettings.Distance,
+				OrbitSettings.Height,
+				math.sin(angle) * OrbitSettings.Distance
+			)
+			orb.CFrame = targetChar.HumanoidRootPart.CFrame * offset
+			task.wait(1/60)
+		end
+	end)
+end
+local function StartOrbitTouch(targetCharacter)
+	if not orbitEnabledTouch then return end
+	DestroyOrbit()
+	if not targetCharacter or not targetCharacter:FindFirstChild("HumanoidRootPart") then return end
+	local ballTemplate = Workspace.WorkspaceCom["001_SoccerBalls"]:FindFirstChild("OrbitTarget")
+	if not ballTemplate then return end
+	orbitBallInstance = ballTemplate:Clone()
+	orbitBallInstance.Name = "OrbitTargetLoop"
+	orbitBallInstance.Parent = Workspace
+	local angle = 0
+	local radius = OrbitSettings.Distance
+	local speed = OrbitSettings.Speed
+	local height = OrbitSettings.Height
+	orbitLoop = game:GetService("RunService").Heartbeat:Connect(function(dt)
+		angle = angle + speed * dt
+		local root = targetCharacter:FindFirstChild("HumanoidRootPart")
+		if root then
+			orbitBallInstance.Position = root.Position + Vector3.new(math.cos(angle)*radius, height, math.sin(angle)*radius)
+		end
+	end)
+end
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if orbitEnabledTouch and input.UserInputType == Enum.UserInputType.Touch then
+		local touchPos = input.Position
+		local camera = Workspace.CurrentCamera
+		local ray = camera:ScreenPointToRay(touchPos.X, touchPos.Y)
+		local hitPart, hitPos = Workspace:FindPartOnRayWithIgnoreList(ray, {localPlayer.Character})
+		if hitPart and hitPart.Parent then
+			for _, player in ipairs(Players:GetPlayers()) do
+				if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+					if hitPart:IsDescendantOf(player.Character) then
+						StartOrbitTouch(player.Character)
+						break
+					end
+				end
+			end
+		end
+	end
+end)
+FunTab:AddToggle({
+	Name = "تفعيل هالة الكرة دون فلنق",
+	Default = false,
+	Callback = function(state)
+		local char = localPlayer.Character
+		local loop = char and char:FindFirstChild("OrbitBallLoop")
+		if state then
+			orbitBall(char, "OrbitBall")
+		elseif loop then
+			loop:Destroy()
+			local orb = workspace.WorkspaceCom["001_SoccerBalls"]:FindFirstChild("OrbitBall")
+			if orb then orb:Destroy() end
+		end
+	end
+})
+FunTab:AddToggle({
+	Name = "المس اي لاعب لتفعيل هالة الكرة عليه",
+	Default = false,
+	Callback = function(state)
+		orbitEnabledTouch = state
+		if not state then
+			DestroyOrbit()
+		end
+	end
+})
+FunTab:AddSection({ Name = "كشف اللاعبين          ", Icon = "rbxassetid://10723346959" })
+local ToggleESP = false
+local ESPFolder = Instance.new("Folder", workspace)
+ESPFolder.Name = "BloodESP"
+
+local function GetAccountAgeString(player)
+    local days = player.AccountAge
+    if days >= 365 then
+        return math.floor(days / 365) .. " سنة"
+    else
+        return days .. " يوم"
+    end
+end
+
+local function CreateBillboard(player)
+    if not player.Character or not player.Character:FindFirstChild("Head") then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESPTag"
+    billboard.AlwaysOnTop = true
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.Adornee = player.Character.Head
+    billboard.Parent = ESPFolder
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = player.Name
+    nameLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+    nameLabel.TextStrokeColor3 = Color3.fromRGB(139, 0, 0)
+    nameLabel.TextStrokeTransparency = 0
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextScaled = true
+    nameLabel.Parent = billboard
+
+    local ageLabel = Instance.new("TextLabel")
+    ageLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    ageLabel.Position = UDim2.new(0, 0, 0.33, 0)
+    ageLabel.BackgroundTransparency = 1
+    ageLabel.Text = "عمر: " .. GetAccountAgeString(player)
+    ageLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+    ageLabel.TextStrokeColor3 = Color3.fromRGB(139, 0, 0)
+    ageLabel.TextStrokeTransparency = 0
+    ageLabel.Font = Enum.Font.Gotham
+    ageLabel.TextScaled = true
+    ageLabel.Parent = billboard
+
+    local distLabel = Instance.new("TextLabel")
+    distLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    distLabel.Position = UDim2.new(0, 0, 0.66, 0)
+    distLabel.BackgroundTransparency = 1
+    distLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+    distLabel.TextStrokeColor3 = Color3.fromRGB(139, 0, 0)
+    distLabel.TextStrokeTransparency = 0
+    distLabel.Font = Enum.Font.Gotham
+    distLabel.TextScaled = true
+    distLabel.Parent = billboard
+
+    task.spawn(function()
+        while billboard.Parent and ToggleESP and player.Character and player.Character:FindFirstChild("Head") do
+            local distance = (game.Players.LocalPlayer.Character.Head.Position - player.Character.Head.Position).Magnitude
+            distLabel.Text = "البعد: " .. math.floor(distance) .. "m"
+
+            local glow = 0.5 + 0.5 * math.sin(tick() * 5)
+            nameLabel.TextTransparency = glow * 0.5
+            ageLabel.TextTransparency = glow * 0.5
+            distLabel.TextTransparency = glow * 0.5
+            
+            nameLabel.TextStrokeTransparency = glow * 0.2
+            
+            task.wait(0.05)
+        end
+        billboard:Destroy()
+    end)
+end
+
+local function EnableESP()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            CreateBillboard(player)
+        end
+    end
+
+    game.Players.PlayerAdded:Connect(function(player)
+        task.wait(2)
+        if ToggleESP then
+            CreateBillboard(player)
+        end
+    end)
+end
+
+local function DisableESP()
+    for _, tag in ipairs(ESPFolder:GetChildren()) do
+        tag:Destroy()
+    end
+end
+
+FunTab:AddToggle({
+    Name = "كشف اللاعبين",
+    Default = false,
+    Callback = function(state)
+        ToggleESP = state
+        if state then
+            EnableESP()
+        else
+            DisableESP()
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ToggleHitbox = false
+
+local HitboxFolder = Instance.new("Folder", workspace)
+HitboxFolder.Name = "BloodHitboxESP"
+
+local function CreateHitbox(character)
+	if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+	local box = Instance.new("SelectionBox")
+	box.Name = "HitboxESP"
+	box.Adornee = character
+	box.LineThickness = 0.15
+	box.Color3 = Color3.fromRGB(255, 0, 0)
+	box.SurfaceColor3 = Color3.fromRGB(255, 0, 0)
+	box.SurfaceTransparency = 0.7
+	box.Parent = HitboxFolder
+
+	task.spawn(function()
+		while box.Parent and ToggleHitbox and character.Parent do
+			local pulse = 0.4 + 0.4 * math.sin(tick() * 8)
+			box.SurfaceTransparency = pulse
+			box.LineTransparency = pulse * 0.5
+			task.wait(0.03)
+		end
+		box:Destroy()
+	end)
+end
+
+local function EnableHitbox()
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character then
+			CreateHitbox(player.Character)
+		end
+	end
+
+	Players.PlayerAdded:Connect(function(player)
+		player.CharacterAdded:Connect(function(char)
+			task.wait(1)
+			if ToggleHitbox then
+				CreateHitbox(char)
+			end
+		end)
+	end)
+end
+
+local function DisableHitbox()
+	for _, v in ipairs(HitboxFolder:GetChildren()) do
+		v:Destroy()
+	end
+end
+
+FunTab:AddToggle({
+	Name = "V2 كشف ",
+	Default = false,
+	Callback = function(state)
+		ToggleHitbox = state
+		if state then
+			EnableHitbox()
+		else
+			DisableHitbox()
+		end
+	end
+})
+
+FunTab:AddSection({ Name = "سبام قوارب في البداية          ", Icon = "rbxassetid://10734941354" })
+FunTab:AddToggle({
+    Name = "سبام قوارب في البداية",
+    Default = false,
+    Callback = function(state)
+        getgenv().Toggle = state
+
+        if state then
+            local Players = game:GetService("Players")
+            local Player = Players.LocalPlayer
+            local Character = Player.Character or Player.CharacterAdded:Wait()
+            local RootPart = Character:WaitForChild("HumanoidRootPart")
+            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+            local molestado1 = workspace:WaitForChild("WorkspaceCom"):WaitForChild("001_CanoeCloneButton").Button
+
+            task.spawn(function()
+                while getgenv().Toggle do
+                    task.wait()
+                    RootPart.CFrame = molestado1.CFrame
+                    task.wait(0.1)
+                    fireclickdetector(molestado1:FindFirstChild("ClickDetector"))
+                    task.wait(0.5)
+
+                    local molestado2 = workspace.WorkspaceCom["001_CanoeStorage"]:FindFirstChild("Canoe")
+                    if molestado2 and molestado2:FindFirstChild("VehicleSeat") then
+                        repeat
+                            RootPart.CFrame = molestado2.VehicleSeat.CFrame + Vector3.new(0, math.random(-1, 1), 0)
+                            task.wait()
+                        until Humanoid.Sit
+
+                        task.wait(0.2)
+                        RootPart.CFrame = CFrame.new(math.random(-40, 40), 4.549, math.random(-40, 40))
+                        task.wait(0.2)
+                        Humanoid.Sit = false
+                        molestado2.Name = "CanoeMolestaHavens"
+                    end
+                end
+            end)
+        end
+    end
+})
+FunTab:AddSection({ Name = "سبام قنابل          ", Icon = "rbxassetid://10709781460" })
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local WorkspaceService = game:GetService("Workspace")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local BombFolder = nil
+pcall(function()
+    BombFolder = WorkspaceService.WorkspaceCom["001_CriminalWeapons"].GiveTools
+end)
+local ExplodeRemote = nil
+pcall(function()
+    ExplodeRemote = ReplicatedStorage.RE["1Blo1wBomb1sServe1r"]
+end)
+
+local BombAmount = 5 
+
+FunTab:AddDropdown({
+    Name = "عدد القنابل",
+    Default = "5",
+    Options = {"5","10","15","20","25","30","35","40","45","50"},
+    Callback = function(value)
+        BombAmount = tonumber(value) or 5
+    end
+})
+
+FunTab:AddButton({
+    Name = "بدا سبام",
+    Callback = function()
+        local Character = Player.Character or Player.CharacterAdded:Wait()
+        local Humanoid = Character:WaitForChild("Humanoid")
+        local RootPart = Character:WaitForChild("HumanoidRootPart")
+        local origin = RootPart.CFrame
+
+        local function getBombCount()
+            local cnt = 0
+            if Player:FindFirstChild("Backpack") then
+                for _, t in ipairs(Player.Backpack:GetChildren()) do
+                    if t:IsA("Tool") and t.Name:lower():find("bomb") then
+                        cnt = cnt + 1
+                    end
+                end
+            end
+            if Player.Character then
+                for _, t in ipairs(Player.Character:GetChildren()) do
+                    if t:IsA("Tool") and t.Name:lower():find("bomb") then
+                        cnt = cnt + 1
+                    end
+                end
+            end
+            return cnt
+        end
+
+        local function collectBombs(target)
+            local collected = 0
+            local BombRef = BombFolder and BombFolder:FindFirstChild("Bomb")
+            local attempts = 0
+            while collected < target and attempts < 400 do
+                attempts = attempts + 1
+                if not BombRef then
+                    for _, d in ipairs(workspace:GetDescendants()) do
+                        if d:IsA("BasePart") and d.Name:lower():find("bomb") then
+                            BombRef = d
+                            break
+                        end
+                    end
+                end
+
+                if BombRef and RootPart then
+                    pcall(function()
+                        RootPart.CFrame = BombRef.CFrame + Vector3.new(0, 2, 0)
+                        if BombRef:FindFirstChild("ClickDetector") then
+                            fireclickdetector(BombRef.ClickDetector)
+                        end
+                        VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+                        task.wait(0.01)
+                        VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
+                    end)
+                end
+
+                task.wait(0.08)
+                collected = getBombCount()
+            end
+            return collected
+        end
+
+        local function throwBombs()
+            local thrown = 0
+            local tools = {}
+            if Player:FindFirstChild("Backpack") then
+                for _, t in ipairs(Player.Backpack:GetChildren()) do
+                    if t:IsA("Tool") and t.Name:lower():find("bomb") then
+                        table.insert(tools, t)
+                    end
+                end
+            end
+            if Player.Character then
+                for _, t in ipairs(Player.Character:GetChildren()) do
+                    if t:IsA("Tool") and t.Name:lower():find("bomb") then
+                        table.insert(tools, t)
+                    end
+                end
+            end
+
+            for _, tool in ipairs(tools) do
+                pcall(function()
+                    if tool.Parent ~= Player.Character then
+                        Humanoid:EquipTool(tool)
+                        task.wait(0.06)
+                    end
+                    if type(tool.Activate) == "function" then
+                        tool:Activate()
+                    end
+                    for i = 1, 2 do
+                        VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+                        task.wait(0.01)
+                        VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
+                    end
+                    task.wait(0.12)
+                    thrown = thrown + 1
+                end)
+            end
+            return thrown
+        end
+
+        task.spawn(function()
+            local collected = collectBombs(BombAmount)
+
+            pcall(function() RootPart.CFrame = origin end)
+            task.wait(0.12)
+
+            local thrown = throwBombs()
+
+            if ExplodeRemote then
+                local safetyLimit = math.max(40, (collected + 10)) 
+                local spamCount = 0
+                while getBombCount() > 0 and spamCount < safetyLimit do
+                    pcall(function()
+                        ExplodeRemote:FireServer("Bomb" .. Player.Name)
+                    end)
+                    spamCount = spamCount + 1
+                    task.wait(0.09)
+                end
+                
+                pcall(function()
+                    ExplodeRemote:FireServer("Bomb" .. Player.Name)
+                end)
+            end
+
+        end)
+    end
+})
+FunTab:AddButton({
+    Name = "حذف كل القنابل",
+    Callback = function()
+        local args = {
+            [1] = "ClearAllTools"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer(unpack(args))
+    end
+})
+local SkyboxTab = Window:MakeTab({ Title = "SKYBOX", Icon = "rbxassetid://10709805838" })
+
+local skyboxEnabled = false
+local skyboxTrack = nil
+local rigidTrack = nil
+local savedNukeBody = {}
+
+local function stopAllAnimations()
+    if rigidTrack then
+        pcall(function()
+            rigidTrack:Stop()
+            rigidTrack:Destroy()
+        end)
+        rigidTrack = nil
+    end
+    
+    if skyboxTrack then
+        pcall(function()
+            skyboxTrack:Stop()
+            skyboxTrack:Destroy()
+        end)
+        skyboxTrack = nil
+    end
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            local animator = humanoid:FindFirstChild("Animator")
+            if animator then
+                for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+                    if track.Animation then
+                        local animId = track.Animation.AnimationId
+                        if animId == "rbxassetid://70883871260184" or animId == "rbxassetid://3695333486" then
+                            pcall(function()
+                                track:Stop()
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+SkyboxTab:AddToggle({
+    Name = "V1",
+    Default = false,
+    Callback = function(value)
+        skyboxEnabled = value
+        
+        if value then
+            local player = game.Players.LocalPlayer
+            local character = player.Character
+            
+            if character then
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    local description = humanoid:GetAppliedDescription()
+                    
+                    savedNukeBody = {
+                        Torso = description.Torso,
+                        RightArm = description.RightArm,
+                        LeftArm = description.LeftArm,
+                        RightLeg = description.RightLeg,
+                        LeftLeg = description.LeftLeg,
+                        Head = description.Head
+                    }
+                    
+                    task.wait(0.2)
+                    
+                    local args = {
+                        [1] = 123402086843885,
+                        [2] = 100839513065432,
+                        [3] = 78300682916056,
+                        [4] = 86276701020724,
+                        [5] = 78409653958165,
+                        [6] = 15093053680
+                    }
+                    
+                    pcall(function()
+                        game:GetService("ReplicatedStorage").Remotes.ChangeCharacterBody:InvokeServer(args)
+                    end)
+                    
+                    task.wait(0.3)
+                    
+                    local newAnim = Instance.new("Animation")
+                    newAnim.AnimationId = "rbxassetid://70883871260184"
+                    
+                    skyboxTrack = humanoid:LoadAnimation(newAnim)
+                    skyboxTrack.Priority = Enum.AnimationPriority.Action4
+                    skyboxTrack:Play(0.1, 1, 0.01)
+                    
+                    task.wait(0.5)
+                    
+                    local plankAnim = Instance.new("Animation")
+                    plankAnim.AnimationId = "rbxassetid://3695333486"
+                    rigidTrack = humanoid:LoadAnimation(plankAnim)
+                    rigidTrack.Priority = Enum.AnimationPriority.Movement
+                    rigidTrack:Play(0.1, 1, 0)
+                end
+            end
+        else
+            stopAllAnimations()
+            
+            task.wait(0.2)
+            
+            if next(savedNukeBody) then
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        local restoreBody = {
+                            [1] = savedNukeBody.Torso,
+                            [2] = savedNukeBody.RightArm,
+                            [3] = savedNukeBody.LeftArm,
+                            [4] = savedNukeBody.RightLeg,
+                            [5] = savedNukeBody.LeftLeg,
+                            [6] = savedNukeBody.Head
+                        }
+                        
+                        local args = {
+                            [1] = restoreBody
+                        }
+                        
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+                        end)
+                        
+                        savedNukeBody = {}
+                    end
+                end
+            end
+        end
+    end
+})
+local nukeFlashEnabled = false
+local nukeFlashTrack = nil
+local flashRigidTrack = nil
+local savedNukeFlashBody = {}
+
+local function stopFlashAnimations()
+    if flashRigidTrack then
+        pcall(function()
+            flashRigidTrack:Stop()
+            flashRigidTrack:Destroy()
+        end)
+        flashRigidTrack = nil
+    end
+    
+    if nukeFlashTrack then
+        pcall(function()
+            nukeFlashTrack:Stop()
+            nukeFlashTrack:Destroy()
+        end)
+        nukeFlashTrack = nil
+    end
+end
+
+SkyboxTab:AddToggle({
+    Name = "V2",
+    Default = false,
+    Callback = function(value)
+        nukeFlashEnabled = value
+        
+        if value then
+            local player = game.Players.LocalPlayer
+            local character = player.Character
+            
+            if character then
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    local description = humanoid:GetAppliedDescription()
+                    
+                    savedNukeFlashBody = {
+                        Torso = description.Torso,
+                        RightArm = description.RightArm,
+                        LeftArm = description.LeftArm,
+                        RightLeg = description.RightLeg,
+                        LeftLeg = description.LeftLeg,
+                        Head = description.Head
+                    }
+                    
+                    task.wait(0.2)
+                    
+                    local args = {
+                        [1] = 123402086843885,
+                        [2] = 100839513065432,
+                        [3] = 78300682916056,
+                        [4] = 86276701020724,
+                        [5] = 78409653958165,
+                        [6] = 15093053680
+                    }
+                    
+                    pcall(function()
+                        game:GetService("ReplicatedStorage").Remotes.ChangeCharacterBody:InvokeServer(args)
+                    end)
+                    
+                    task.wait(0.3)
+                    
+                    local newAnim = Instance.new("Animation")
+                    newAnim.AnimationId = "rbxassetid://70883871260184"
+                    
+                    nukeFlashTrack = humanoid:LoadAnimation(newAnim)
+                    nukeFlashTrack.Priority = Enum.AnimationPriority.Action4
+                    nukeFlashTrack:Play(0.1, 1, 1)
+                    
+                    task.wait(0.1)
+                    nukeFlashTrack:AdjustSpeed(5)
+                    
+                    task.wait(0.3)
+                    
+                    local plankAnim = Instance.new("Animation")
+                    plankAnim.AnimationId = "rbxassetid://3695333486"
+                    flashRigidTrack = humanoid:LoadAnimation(plankAnim)
+                    flashRigidTrack.Priority = Enum.AnimationPriority.Movement
+                    flashRigidTrack:Play(0.1, 1, 0)
+                end
+            end
+        else
+            stopFlashAnimations()
+            
+            task.wait(0.2)
+            
+            if next(savedNukeFlashBody) then
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        local restoreBody = {
+                            [1] = savedNukeFlashBody.Torso,
+                            [2] = savedNukeFlashBody.RightArm,
+                            [3] = savedNukeFlashBody.LeftArm,
+                            [4] = savedNukeFlashBody.RightLeg,
+                            [5] = savedNukeFlashBody.LeftLeg,
+                            [6] = savedNukeFlashBody.Head
+                        }
+                        
+                        local args = {
+                            [1] = restoreBody
+                        }
+                        
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+                        end)
+                        
+                        savedNukeFlashBody = {}
+                    end
+                end
+            end
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local ChangeCharacterBody = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeCharacterBody")
+local ResetAppearance = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ResetCharacterAppearance")
+
+local LoopAnim = false
+local CurrentTrack
+local Initialized = false
+
+local function ApplyFreshBang()
+	pcall(function()
+		local args = {
+			[1] = {
+				96655874457685,
+				123402086843885,
+				78300682916056,
+				86276701020724,
+				78409653958165,
+				120668655481073
+			}
+		}
+		ChangeCharacterBody:InvokeServer(unpack(args))
+	end)
+end
+
+local function PlayAnimation()
+	local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+	local humanoid = char:WaitForChild("Humanoid")
+	local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+
+	local anim = Instance.new("Animation")
+	anim.AnimationId = "rbxassetid://70883871260184"
+
+	local track = animator:LoadAnimation(anim)
+	track.Priority = Enum.AnimationPriority.Action
+	track.Looped = false
+	track:Play()
+
+	CurrentTrack = track
+end
+
+local function StopEverything()
+	LoopAnim = false
+
+	if CurrentTrack then
+		pcall(function()
+			CurrentTrack:Stop()
+		end)
+		CurrentTrack = nil
+	end
+
+	pcall(function()
+		ResetAppearance:FireServer()
+	end)
+
+	task.wait(0.5)
+
+	local char = LocalPlayer.Character
+	if char then
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.Health = 0
+		end
+	end
+end
+
+SkyboxTab:AddToggle({
+	Name = "V4",
+	Default = false,
+	Callback = function(Value)
+		if not Initialized then
+			Initialized = true
+			return
+		end
+
+		if Value then
+			if LoopAnim then return end
+			LoopAnim = true
+
+			task.spawn(function()
+				while LoopAnim do
+					PlayAnimation()
+					task.wait(0.1)
+				end
+			end)
+
+			task.delay(1.2, ApplyFreshBang)
+		else
+			StopEverything()
+		end
+	end
+})
+local TabCamera = Window:MakeTab({"الكاميرا", "rbxassetid://10709789686"})
+TabCamera:AddSection({ Name = "قفل الكاميرا          ", Icon = "rbxassetid://10709797725" })
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local CamDistance = 10
+local CamHeight = 5
+local CamTilt = 0
+local CamLower = 0
+local CamLocked = false
+local SmoothSpeed = 0.15
+
+local CamPosition = nil
+local CamLookAt = nil
+
+local function updateCamera()
+	if CamLocked and CamPosition and CamLookAt then
+		local offset = Vector3.new(0, CamHeight - CamLower, CamDistance)
+		local targetCFrame = CFrame.new(CamPosition + offset, CamLookAt) * CFrame.Angles(math.rad(CamTilt), 0, 0)
+		Camera.CameraType = Enum.CameraType.Scriptable
+		Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, SmoothSpeed)
+	end
+end
+
+TabCamera:AddSlider({
+	Name = "بعد الكاميرا",
+	Min = 1,
+	Max = 50,
+	Default = CamDistance,
+	Callback = function(value)
+		CamDistance = value
+	end
+})
+
+TabCamera:AddSlider({
+	Name = "ارتفاع الكاميرا",
+	Min = -50,
+	Max = 50,
+	Default = CamHeight,
+	Callback = function(value)
+		CamHeight = value
+	end
+})
+
+TabCamera:AddSlider({
+	Name = "انحناء الكاميرا",
+	Min = -90,
+	Max = 90,
+	Default = CamTilt,
+	Callback = function(value)
+		CamTilt = value
+	end
+})
+
+TabCamera:AddSlider({
+	Name = "نزول الكاميرا",
+	Min = -50,
+	Max = 50,
+	Default = CamLower,
+	Callback = function(value)
+		CamLower = value
+	end
+})
+
+TabCamera:AddToggle({
+	Name = "قفل الكاميرا",
+	Default = false,
+	Callback = function(state)
+		if state then
+			local char = LocalPlayer.Character
+			if char and char:FindFirstChild("HumanoidRootPart") then
+				local hrp = char.HumanoidRootPart
+				local forward = hrp.CFrame.LookVector
+				CamPosition = hrp.Position - forward * CamDistance + Vector3.new(0, CamHeight - CamLower, 0)
+				CamLookAt = hrp.Position
+			end
+			CamLocked = true
+		else
+			CamLocked = false
+			Camera.CameraType = Enum.CameraType.Custom
+			CamPosition = nil
+			CamLookAt = nil
+		end
+	end
+})
+RunService.RenderStepped:Connect(updateCamera)
