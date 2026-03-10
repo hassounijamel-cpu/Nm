@@ -3010,3 +3010,526 @@ NameTab:AddToggle({
         end
     end
 })
+local Tab4 = Window:MakeTab({ Title = "نسخ سكنات", Icon = "rbxassetid://10734952036" })
+Tab4:AddSection({ Name = "          v1 نسخ سكنات", Icon = "rbxassetid://10734952036" })
+local Players = game:GetService("Players")
+local Rep = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local lastValidTarget = nil
+local copyType = "بروكهافن"
+local Target = nil
+
+local function Wear(id)
+    pcall(function()
+        Rep.Remotes.Wear:InvokeServer(tonumber(id))
+    end)
+end
+
+local function RESETBLOCK()
+     args = {
+        [1] = {0, 0, 0, 0, 0, 0},
+        [2] = "AllBlocky"
+    }
+    pcall(function()
+        Rep.Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+    end)
+end
+
+local function ApplySkinToneFromUserId(userId)
+    pcall(function()
+        local info = Players:GetCharacterAppearanceInfoAsync(userId)
+        if info.bodyColors then
+            local headColor = info.bodyColors.HeadColor
+            if headColor then
+                Rep.Remotes.ChangeBodyColor:FireServer(tostring(headColor))
+            end
+        end
+    end)
+end
+
+local function CopyClothing(desc)
+    local items = {desc.Shirt, desc.Pants, desc.GraphicTShirt, desc.Face}
+    for _, id in ipairs(items) do
+        if tonumber(id) and id ~= 0 then
+            Wear(id)
+            task.wait(0.1)
+        end
+    end
+end
+
+local function CopyAccessories(desc)
+    pcall(function()
+        for _, v in ipairs(desc:GetAccessories(true)) do
+            if v.AssetId then
+                Wear(v.AssetId)
+                task.wait(0.1)
+            end
+        end
+    end)
+end
+
+local function CopyBodyParts(desc, source)
+     args = {
+        [1] = {
+            tonumber(desc.Torso),
+            tonumber(desc.RightArm),
+            tonumber(desc.LeftArm),
+            tonumber(desc.RightLeg),
+            tonumber(desc.LeftLeg),
+            tonumber(desc.Head)
+        },
+        [2] = source
+    }
+    pcall(function()
+        Rep.Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+    end)
+end
+
+local function CopyAnimations(desc)
+    local anims = {
+        desc.IdleAnimation,
+        desc.WalkAnimation,
+        desc.RunAnimation,
+        desc.JumpAnimation,
+        desc.FallAnimation,
+        desc.SwimAnimation
+    }
+    for _, animId in ipairs(anims) do
+        if tonumber(animId) and animId ~= 0 then
+            Wear(animId)
+            task.wait(0.1)
+        end
+    end
+end
+
+local function CopyBrookhaven(targetPlayer)
+    local humanoid = targetPlayer.Character and targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local desc = humanoid:GetAppliedDescription()
+    local bodyColors = targetPlayer.Character:FindFirstChildOfClass("BodyColors")
+    if bodyColors then
+        local headColor = bodyColors.HeadColor
+        if headColor then
+            Rep.Remotes.ChangeBodyColor:FireServer(tostring(headColor))
+        end
+    end
+
+    pcall(function()
+        CopyAccessories(LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):GetAppliedDescription())
+        RESETBLOCK()
+        CopyAccessories(desc)
+        task.wait(0.1)
+        CopyBodyParts(desc, "LOC4THub")
+        CopyClothing(desc)
+        CopyAnimations(desc)
+    end)
+end
+
+local function CopyOriginalAvatar(userId)
+    pcall(function()
+        local desc = Players:GetHumanoidDescriptionFromUserId(userId)
+        CopyAccessories(LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):GetAppliedDescription())
+        RESETBLOCK()
+        CopyAccessories(desc)
+        task.wait(0.1)
+        CopyBodyParts(desc, "LOC4THub")
+        CopyClothing(desc)
+        CopyAnimations(desc)
+        ApplySkinToneFromUserId(userId)
+    end)
+end
+
+local function findPlayerByName(partialName)
+    if not partialName or partialName == "" then return nil end
+    partialName = partialName:lower()
+    
+    local foundPlayers = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Name:lower():find(partialName, 1, true) then
+            table.insert(foundPlayers, player)
+        end
+    end
+
+    table.sort(foundPlayers, function(a, b)
+        local aStart = a.Name:lower():sub(1, #partialName) == partialName
+        local bStart = b.Name:lower():sub(1, #partialName) == partialName
+        if aStart and not bStart then return true end
+        if not aStart and bStart then return false end
+        return #a.Name < #b.Name
+    end)
+    
+    return foundPlayers[1]
+end
+
+Tab4:AddTextBox({
+    Name = "اسم اللاعب",
+    Default = "",
+    Callback = function(text)
+        if text == "" then
+            if lastValidTarget then
+                text = lastValidTarget
+            else
+                return
+            end
+        end
+        local targetPlayer = findPlayerByName(text)
+        if targetPlayer then
+            Target = targetPlayer
+            lastValidTarget = targetPlayer.Name
+        end
+    end
+})
+
+Tab4:AddDropdown({
+    Name = "طريقة النسخ",
+    Options = {"بروكهافن", "سكن لاساسي"},
+    Callback = function(option)
+        copyType = option
+    end
+})
+
+Tab4:AddButton({
+    Name = "نسخ",
+    Callback = function()
+        if not Target then return end
+        if copyType == "بروكهافن" then
+            CopyBrookhaven(Target)
+        else
+            CopyOriginalAvatar(Target.UserId)
+        end
+    end
+})
+Tab4:AddSection({ Name = "          v2 نسخ سكنات", Icon = "rbxassetid://10734952036" })
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+local Target = nil
+
+local function GetPlayerNames()
+    local PlayerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        table.insert(PlayerNames, player.Name)
+    end
+    return PlayerNames
+end
+
+local Dropdown = Tab4:AddDropdown({
+    Name = "اختيار لاعب",
+    Options = GetPlayerNames(),
+    Default = Target,
+    Callback = function(Value)
+        Target = Value
+    end
+})
+
+local function UpdateDropdown()
+    Dropdown:Refresh(GetPlayerNames(), true)
+end
+
+Players.PlayerAdded:Connect(UpdateDropdown)
+Players.PlayerRemoving:Connect(UpdateDropdown)
+Tab4:AddButton({
+    Name = "نسخ",
+    Callback = function()
+        if not Target then return end
+
+        local LP = Players.LocalPlayer
+        local LChar = LP.Character
+        local TPlayer = Players:FindFirstChild(Target)
+
+        if TPlayer and TPlayer.Character then
+            local LHumanoid = LChar and LChar:FindFirstChildOfClass("Humanoid")
+            local THumanoid = TPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+            if LHumanoid and THumanoid then
+                local LDesc = LHumanoid:GetAppliedDescription()
+
+                for _, acc in ipairs(LDesc:GetAccessories(true)) do
+                    if acc.AssetId and tonumber(acc.AssetId) then
+                        Remotes.Wear:InvokeServer(tonumber(acc.AssetId))
+                        task.wait(0.2)
+                    end
+                end
+
+                if tonumber(LDesc.Shirt) then
+                    Remotes.Wear:InvokeServer(tonumber(LDesc.Shirt))
+                    task.wait(0.2)
+                end
+
+                if tonumber(LDesc.Pants) then
+                    Remotes.Wear:InvokeServer(tonumber(LDesc.Pants))
+                    task.wait(0.2)
+                end
+
+                if tonumber(LDesc.Face) then
+                    Remotes.Wear:InvokeServer(tonumber(LDesc.Face))
+                    task.wait(0.2)
+                end
+
+                local PDesc = THumanoid:GetAppliedDescription()
+
+                local argsBody = {
+                    [1] = {
+                        [1] = PDesc.Torso,
+                        [2] = PDesc.RightArm,
+                        [3] = PDesc.LeftArm,
+                        [4] = PDesc.RightLeg,
+                        [5] = PDesc.LeftLeg,
+                        [6] = PDesc.Head
+                    }
+                }
+                Remotes.ChangeCharacterBody:InvokeServer(unpack(argsBody))
+                task.wait(0.5)
+
+                if tonumber(PDesc.Shirt) then
+                    Remotes.Wear:InvokeServer(tonumber(PDesc.Shirt))
+                    task.wait(0.3)
+                end
+
+                if tonumber(PDesc.Pants) then
+                    Remotes.Wear:InvokeServer(tonumber(PDesc.Pants))
+                    task.wait(0.3)
+                end
+
+                if tonumber(PDesc.Face) then
+                    Remotes.Wear:InvokeServer(tonumber(PDesc.Face))
+                    task.wait(0.3)
+                end
+
+                for _, v in ipairs(PDesc:GetAccessories(true)) do
+                    if v.AssetId and tonumber(v.AssetId) then
+                        Remotes.Wear:InvokeServer(tonumber(v.AssetId))
+                        task.wait(0.3)
+                    end
+                end
+
+                local SkinColor = TPlayer.Character:FindFirstChild("Body Colors")
+                if SkinColor then
+                    Remotes.ChangeBodyColor:FireServer(tostring(SkinColor.HeadColor))
+                    task.wait(0.3)
+                end
+
+                if tonumber(PDesc.IdleAnimation) then
+                    Remotes.Wear:InvokeServer(tonumber(PDesc.IdleAnimation))
+                    task.wait(0.3)
+                end
+
+                local Bag = TPlayer:FindFirstChild("PlayersBag")
+                if Bag then
+                    if Bag:FindFirstChild("RPName") and Bag.RPName.Value ~= "" then
+                        Remotes.RPNameText:FireServer("RolePlayName", Bag.RPName.Value)
+                        task.wait(0.3)
+                    end
+                    if Bag:FindFirstChild("RPBio") and Bag.RPBio.Value ~= "" then
+                        Remotes.RPNameText:FireServer("RolePlayBio", Bag.RPBio.Value)
+                        task.wait(0.3)
+                    end
+                    if Bag:FindFirstChild("RPNameColor") then
+                        Remotes.RPNameColor:FireServer("PickingRPNameColor", Bag.RPNameColor.Value)
+                        task.wait(0.3)
+                    end
+                    if Bag:FindFirstChild("RPBioColor") then
+                        Remotes.RPNameColor:FireServer("PickingRPBioColor", Bag.RPBioColor.Value)
+                        task.wait(0.3)
+                    end
+                end
+            end
+        end
+    end
+})
+local TabSund = Window:MakeTab({ Title = " اغاني مجانية", Icon = "rbxassetid://10734931596" })
+TabSund:AddSection({ Name = "الاغاني متحتاح جيمباس والكل يسمعها          ", Icon = "rbxassetid://10734934132" })
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local musicList = {
+    ["ضحكة مال سوكونا"] = "116395665143666",
+    ["غوجو توسيع النطاق"] = "139787675170861",
+    ["صوت فايت مزعج شوي"] = "132639404905710",
+    ["صوت بنت انمي مشكوك فجد خالة عمتو"] = "109779146034241",
+    ["صوت بنت انمي ثاني"] = "102993326623397",
+    ["صوت اسد"] = "9126101636",
+    ["صوت بنت انمي 3"] = "103430674469051",
+    ["صوت انمي مزعج"] = "97551835622379",
+    ["صوت سلاح فري فاير"] = "6909650402",
+    ["جراني"] = "1591860354",
+    ["توجي"] = "132509237694639",
+    ["اوريتشيمارو "] = "135109036831389",
+    ["ضحكة سونيك"] = "7337298420",
+    ["ازعاج"] = "146563959",
+    ["اغنية فينوم"] = "8086734311",
+    ["صوت فينوم"] = "126497226413207",
+    ["صوت رعد"] = "6994934244",
+    ["جوجوتسو كايسن"] = "18985328962",
+    ["صوت ازعاج 2"] = "94692079812822",
+    ["صوت ازعاج 3"] = "89442290120460",
+}
+
+local musicOptions = {}
+for name,_ in pairs(musicList) do
+    table.insert(musicOptions,name)
+end
+table.sort(musicOptions)
+
+local selectedMusic = ""
+local soundSpeed = 1
+local soundVolume = 1
+local soundRange = 100
+local spamToggle = false
+local spamTask = nil
+
+TabSund:AddDropdown({
+    Name = "اختيار الصوت",
+    Options = musicOptions,
+    Default = musicOptions[1],
+    Callback = function(selected)
+        selectedMusic = musicList[selected]
+    end
+})
+
+TabSund:AddSlider({
+    Name = "سرعة الصوت",
+    Min = 0.5,
+    Max = 2,
+    Default = 1,
+    Increment = 0.05,
+    Callback = function(v)
+        soundSpeed = v
+    end
+})
+
+TabSund:AddSlider({
+    Name = "قوة الصوت",
+    Min = 0,
+    Max = 10,
+    Default = 1,
+    Increment = 0.1,
+    Callback = function(v)
+        soundVolume = v
+    end
+})
+
+TabSund:AddSlider({
+    Name = "مدى الصوت",
+    Min = 10,
+    Max = 300,
+    Default = 100,
+    Increment = 5,
+    Callback = function(v)
+        soundRange = v
+    end
+})
+
+local function playOnce()
+    if selectedMusic == "" then
+        if NotifyEnabled then
+            redzlib:MakeNotify({Title="LOC4T HUB",Text="اختار صوت اول شي",Time=2})
+        end
+        return
+    end
+
+    local audioID = selectedMusic
+    local GunSoundEvent = ReplicatedStorage:FindFirstChild("1Gu1nSound1s", true)
+    if GunSoundEvent then
+        GunSoundEvent:FireServer(workspace, audioID, 1)
+    end
+
+    task.wait(0.2)
+
+    local GuinRemote = ReplicatedStorage.RE:FindFirstChild("1Gu1n")
+    if not GuinRemote then return end
+
+    for _,player in ipairs(Players:GetPlayers()) do
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
+
+            task.spawn(function()
+                local Sound = Instance.new("Sound")
+                Sound.SoundId = "rbxassetid://"..audioID
+                Sound.Volume = soundVolume
+                Sound.PlaybackSpeed = soundSpeed
+                Sound.RollOffMaxDistance = soundRange
+                Sound.Looped = false
+                Sound.Parent = hrp
+                Sound:Play()
+                Sound.Ended:Connect(function()
+                    Sound:Destroy()
+                end)
+            end)
+
+            task.spawn(function()
+                pcall(function()
+                    firesignal(GuinRemote.OnClientEvent, table.unpack({
+                        [1]=player,
+                        [2]=hrp,
+                        [3]=hrp,
+                        [4]=Vector3.new(0,-1,0),
+                        [5]=Vector3.new(0,0,0),
+                        [6]=hrp,
+                        [7]=hrp,
+                        [8]=audioID,
+                        [9]=audioID,
+                        [10]={[1]=true},
+                        [11]={25,Vector3.new(0.25,0.25,soundRange),BrickColor.new("Bright yellow"),0.25,Enum.Material.SmoothPlastic,0.25},
+                        [12]=true,
+                        [13]=false
+                    }))
+                end)
+            end)
+
+            task.spawn(function()
+                pcall(function()
+                    GuinRemote:FireServer(table.unpack({
+                        [1]=hrp,
+                        [2]=hrp,
+                        [3]=Vector3.new(0,-1,0),
+                        [4]=Vector3.new(0,0,0),
+                        [5]=hrp,
+                        [6]=hrp,
+                        [7]=audioID,
+                        [8]=audioID,
+                        [9]={[1]=true},
+                        [10]={25,Vector3.new(0.25,0.25,soundRange),BrickColor.new("Bright yellow"),0.25,Enum.Material.SmoothPlastic,0.25},
+                        [11]=true,
+                        [12]=false
+                    }))
+                end)
+            end)
+        end
+    end
+
+    if NotifyEnabled then
+        redzlib:MakeNotify({Title="LOC4T HUB",Text="تم تشغيل الصوت",Time=2})
+    end
+end
+TabSund:AddButton({
+    Name = "تشغيل مرة وحدة",
+    Callback = function()
+        playOnce()
+    end
+})
+TabSund:AddToggle({
+    Name = "سبام تشغيل",
+    Default = false,
+    Callback = function(v)
+        spamToggle = v
+        if v then
+            spamTask = task.spawn(function()
+                while spamToggle do
+                    playOnce()
+                    task.wait(1)
+                end
+            end)
+        else
+            spamToggle = false
+            if spamTask then
+                task.cancel(spamTask)
+                spamTask = nil
+            end
+        end
+    end
+})
