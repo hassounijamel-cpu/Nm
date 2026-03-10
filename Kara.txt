@@ -8109,7 +8109,6 @@ UniversalTab:AddButton({
 })
 
 local UniversalTab = Window:MakeTab({"ككهه", "plane"})
-
 TabCamera:AddSection({ Name = "قفل الكاميرا          ", Icon = "rbxassetid://10709797725" })
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
@@ -8199,7 +8198,208 @@ TabCamera:AddToggle({
 RunService.RenderStepped:Connect(updateCamera)
 
 local UniversalTab = Window:MakeTab({"ا", "plane"})
-
+BodyTab:AddSection({ Name = "اجسام اولاد كاملة          ", Icon = "rbxassetid://10734943902" })
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجلين",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%D9%8A%D9%86"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل شبح يمنى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D8%B4%D8%A8%D8%AD%20%D9%8A%D9%85%D9%86%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل شبح يسرى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D8%B4%D8%A8%D8%AD%20%D9%8A%D8%B3%D8%B1%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل مقطوعة",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D9%85%D9%82%D8%B7%D9%88%D8%B9%D8%A9"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل مافيا يمنى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D9%85%D8%A7%D9%81%D9%8A%D8%A7%20%D9%8A%D9%85%D9%86%D8%A9"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل مافيا  يسرى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D9%85%D8%A7%D9%81%D9%8A%D8%A7%20%D9%8A%D8%B3%D8%B1%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد طويل برجل مافيا  يسرى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D9%85%D8%A7%D9%81%D9%8A%D8%A7%20%D9%8A%D8%B3%D8%B1%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ولد انمي",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A7%D9%86%D9%85%D9%8A%202"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم مونستر مطلوب",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D9%85%D9%88%D9%86%D8%B3%D8%AA%D8%B1"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم مونستر تركيب مورفن",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D9%85%D9%88%D8%B1%D9%81%D9%86"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم ترند",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%AA%D8%B1%D9%86%D8%AF"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم كيوت",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D9%83%D9%8A%D9%88%D8%AA%201"))()
+    end
+})
+BodyTab:AddSection({ Name = "اجسام بنات كاملة          ", Icon = "rbxassetid://10734943902" })
+BodyTab:AddButton({
+    Name = "جسم بنت طويل برجلين",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body-2/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A8%D9%86%D8%AA%20%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%D9%8A%D9%86"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم بنت طويل برجل شبح يمنى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body-2/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A8%D9%86%D8%AA%20%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D8%B4%D8%A8%D8%AD%20%D9%8A%D9%85%D9%86%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم بنت طويل برجل شبح يسرى",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body-2/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A8%D9%86%D8%AA%20%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D8%B4%D8%A8%D8%AD%20%D9%8A%D8%B3%D8%B1%D9%89"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم بنت طويل برجل مقطوعة",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body-2/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A8%D9%86%D8%AA%20%D8%B7%D9%88%D9%8A%D9%84%20%D8%A8%D8%B1%D8%AC%D9%84%20%D9%85%D9%82%D8%B7%D9%88%D8%B9%D8%A9"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "جسم بنت انمي",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Body-2/refs/heads/main/%D8%AC%D8%B3%D9%85%20%D8%A8%D9%86%D8%AA%20%D8%A7%D9%86%D9%85%D9%8A"))()
+    end
+})
+BodyTab:AddSection({ Name = " R6 اجسام          ", Icon = "rbxassetid://10734943902" })
+BodyTab:AddButton({
+    Name = "R6_1",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R61"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_2",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R62"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_3",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R63"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_4",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R64"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_5",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R67"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_1X1X1X",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R6%5Cn1X1X1X1"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_GIRL1",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R6girl"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_GIRL2",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R6girl2"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "R6_مقلوب",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/R6/refs/heads/main/R6%D9%85%D9%82%D9%84%D9%88%D8%A8"))()
+    end
+})
+BodyTab:AddSection({ Name = "  اجسام اقزام       ", Icon = "rbxassetid://10734943902" })
+BodyTab:AddButton({
+    Name = "قزم 1",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%201"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 2",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%202"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 3",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%203"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 4",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%204"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 5",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%205"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 6",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%206"))()
+    end
+})
+BodyTab:AddButton({
+    Name = "قزم 7",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bruton-lua-sources/Mini-body/refs/heads/main/%D9%82%D8%B2%D9%85%207"))()
+    end
+})
 local UniversalTab = Window:MakeTab({"ك", "plane"})
 
 local UniversalTab = Window:MakeTab({"ح", "plane"})
