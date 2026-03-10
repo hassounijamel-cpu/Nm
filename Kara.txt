@@ -8109,6 +8109,7 @@ UniversalTab:AddButton({
 })
 
 local UniversalTab = Window:MakeTab({"ككهه", "plane"})
+
 TabCamera:AddSection({ Name = "قفل الكاميرا          ", Icon = "rbxassetid://10709797725" })
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
@@ -8196,3 +8197,13 @@ TabCamera:AddToggle({
 	end
 })
 RunService.RenderStepped:Connect(updateCamera)
+
+local UniversalTab = Window:MakeTab({"ا", "plane"})
+
+local UniversalTab = Window:MakeTab({"ك", "plane"})
+
+local UniversalTab = Window:MakeTab({"ح", "plane"})
+
+local UniversalTab = Window:MakeTab({"ج", "plane"})
+
+local UniversalTab = Window:MakeTab({"ص", "plane"})
