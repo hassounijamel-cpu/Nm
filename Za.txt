@@ -41,10 +41,10 @@ workspace.FallenPartsDestroyHeight = -math.huge
 
 
 local Window = Libary:MakeWindow({
-    Title = "MI HUB",
-    SubTitle = "        BROOKHAVEN RP| by MI TEAM",
-    LoadText = "Loading MI HUB",
-    Flags = "MiHub_Broookhaven"
+    Title = "NEYMAR HUB",
+    SubTitle = "        BROOKHAVEN RP| by NEYMAR TEAM",
+    LoadText = "Loading NEYMAR HUB",
+    Flags = "NEYMARHUB_Broookhaven"
 })
 
 
@@ -52,4 +52,84 @@ local Window = Libary:MakeWindow({
 Window:AddMinimizeButton({
     Button = { Image = "rbxassetid://127944178494237", BackgroundTransparency = 0 },
     Corner = { CornerRadius = UDim.new(35, 1) },
+})
+	local InfoTab = Window:MakeTab({ Title = "حقوق", Icon = "rbxassetid://15309138473" })
+InfoTab:AddDiscordInvite({
+    Name = "تم صنع هذا السكربت بواسطه نيمار حسنين",
+    Description = "WLV22حسابي تيك",
+    Logo = "rbxassetid://127944178494237",
+    Invite = "@WLV22",
+})
+InfoTab:AddParagraph({ "NEYMAR POR", "NEYMAR HUB" })
+InfoTab:AddParagraph({ "3MK NEYMAR", "NEYMAR 3MK" })
+
+InfoTab:AddSection({ "Rejoin" })
+InfoTab:AddButton({
+    Name = "Rejoin",
+    Callback = function()
+        local TeleportService = game:GetService("TeleportService")
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+    end
+})
+
+InfoTab:AddButton({
+    Name = "ServerHop ",
+    Callback = function()
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local PlaceId = game.PlaceId
+
+        local function serverRequest(url)
+            if http_request then
+                return http_request({Url = url, Method = "GET"})
+            elseif syn and syn.request then
+                return syn.request({Url = url, Method = "GET"})
+            elseif fluxus and fluxus.request then
+                return fluxus.request({Url = url, Method = "GET"})
+            elseif request then
+                return request({Url = url, Method = "GET"})
+            else
+                warn("Exploit não suporta http_request.")
+                return nil
+            end
+        end
+
+        local function GetServers()
+            local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?limit=100"
+            local data = serverRequest(url)
+            if not data then return {} end
+
+            local body = data.Body or data.body
+            local decoded = HttpService:JSONDecode(body)
+            local servers = {}
+
+            for _, server in pairs(decoded.data or {}) do
+                if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                    table.insert(servers, server.id)
+                end
+            end
+            return servers
+        end
+
+        local servers = GetServers()
+        if #servers > 0 then
+            local chosen = servers[math.random(1, #servers)]
+            TeleportService:TeleportToPlaceInstance(PlaceId, chosen, LocalPlayer)
+        else
+            warn("Nenhum servidor diferente encontrado.")
+        end
+    end
+})
+
+
+InfoTab:AddSection({ "Dev Console" })
+InfoTab:AddButton({
+    Name = "Dev Console",
+    Callback = function()
+        local StarterGui = game:GetService("StarterGui")
+        pcall(function()
+            StarterGui:SetCore("DevConsoleVisible", true)
+        end)
+    end
 })
