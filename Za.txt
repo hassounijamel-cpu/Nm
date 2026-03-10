@@ -1,0 +1,55 @@
+local remote = game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1RPNam1eTex1t")
+local selectedPlayer = nil 
+
+local mensagens = {
+	"",
+	"",
+	"N",
+	"NE",
+	"NEY ",
+	"NEYM",
+	"NEYMA",
+	"NEYMAR",
+	"NEYMAR H",
+	"NEYMAR HUB ",
+	"NEYMAR HUB B",
+	"NEYMAR HUB BR",
+	"NEYMAR HUB BRO",
+	"NEYMAR HUB BROO",
+	"NEYMAR HUB BROOK",
+	"NEYMAR HUB BROOKH",
+	"NEYMAR HUB BROOKHA",
+	"NEYMAR HUB BROOKHAV",
+	"NEYMAR HUB BROOKHAVE",
+	"NEYMAR HUB BROOKHAVEN",
+	"",
+	"",
+}
+
+
+for _, mensagem in ipairs(mensagens) do
+	remote:FireServer("RolePlayBio", mensagem)
+	wait(0.1)
+end
+
+local Libary = loadstring(game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/ui/refs/heads/main/ui"))()
+
+  Libary:SetTheme("PeachPuff")
+
+workspace.FallenPartsDestroyHeight = -math.huge
+
+
+
+local Window = Libary:MakeWindow({
+    Title = "MI HUB",
+    SubTitle = "        BROOKHAVEN RP| by MI TEAM",
+    LoadText = "Loading MI HUB",
+    Flags = "MiHub_Broookhaven"
+})
+
+
+
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://127944178494237", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
